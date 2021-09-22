@@ -128,23 +128,31 @@ app.synth();`;
 
   // custom template
   private projectStackContents(projectName: string): string {
-    return `import { Construct, Stack, StackProps } from '@aws-cdk/core';
+    return `
+import * as s3mod from 's3newmodule';
+import { Construct, Stack, StackProps } from '@aws-cdk/core';
 import { Topic } from '@aws-cdk/aws-sns';
 import { EmailSubscription } from '@aws-cdk/aws-sns-subscriptions';
+
 export interface ${projectName}StackProps extends StackProps { }
 const errorNotificationEmails = ['support@support.com'];
 export class ${projectName}Stack extends Stack {
   constructor(scope: Construct, id: string, props?: ${projectName}StackProps) {
     super(scope, id, props);
-    const STAGE = this.node.tryGetContext('STAGE');
-    const errorNotificationTopic = new Topic(this, '${projectName}-error-notification-topic', {
-      displayName: \`${projectName}-error-notification-topic-\${STAGE}\`,
-      topicName: \`${projectName}-error-notification-topic-\${STAGE}\`,
+    // const STAGE = this.node.tryGetContext('STAGE');
+      new s3mod.NotifyingBucket(this, 'MyNotifyingBucket', {
+      prefix: 'images/',
+      nameofBucket: "syras1-nation-bucket"
     });
     
-    errorNotificationEmails.forEach(email => {
-      errorNotificationTopic.addSubscription(new EmailSubscription(email));
-    });
+    // const errorNotificationTopic = new Topic(this, '${projectName}-error-notification-topic', {
+    //   displayName: \`${projectName}-error-notification-topic-\${STAGE}\`,
+    //   topicName: \`${projectName}-error-notification-topic-\${STAGE}\`,
+    // });
+    
+    // errorNotificationEmails.forEach(email => {
+    //   errorNotificationTopic.addSubscription(new EmailSubscription(email));
+    // });
   }
 }`;
   }
